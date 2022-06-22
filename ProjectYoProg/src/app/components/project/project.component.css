@@ -1,0 +1,14 @@
+.row{
+    background-color: cadetblue;
+    padding: 20px;
+}
+.container{
+    width: auto;
+}
+.pt1, .pt2{
+    display: inline-block;
+    text-align: justify;
+}
+.img-proj{
+   box-shadow: 10px 10px 30px black; 
+}
