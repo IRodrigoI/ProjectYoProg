@@ -4,6 +4,9 @@
  */
 package com.miportfolio.rsa.Security.Controller;
 
+import com.miportfolio.rsa.Security.Dto.JwtDto;
+import com.miportfolio.rsa.Security.Dto.LoginUsuario;
+import com.miportfolio.rsa.Security.Dto.NuevoUsuario;
 import com.miportfolio.rsa.Security.Entity.Rol;
 import com.miportfolio.rsa.Security.Entity.Usuario;
 import com.miportfolio.rsa.Security.Enums.RolNombre;
@@ -54,13 +57,13 @@ public class AuthController {
         if(bindingResult.hasErrors())
             return new ResponseEntity(new Mensaje("Campos erróneos o eMail inválido."),HttpStatus.BAD_REQUEST);
         
-        if(usuarioService.existsByNombreUsuario(nombreUsuario.getNombreUsuario()))
+        if(usuarioService.existsByNombreUsuario(nuevoUsuario.getNombreUsuario()))
             return new ResponseEntity(new Mensaje("El nombre de Usuario ya existe."),HttpStatus.BAD_REQUEST);
         
-        if(usuarioService.existsByEmail(email.getEmail()))
+        if(usuarioService.existsByEmail(nuevoUsuario.getEmail()))
             return new ResponseEntity(new Mensaje("El eMail ya existe."),HttpStatus.BAD_REQUEST);
         
-        Usuario usuario = new Usuario(nuevoUsuario.getNombre(), nuevoUsuario.getNombreUsuario(), nuevoUsuario.getEmail(), passwordEncoder.encode(nuevoUsuario).getPassword());
+        Usuario usuario = new Usuario(nuevoUsuario.getNombre(), nuevoUsuario.getNombreUsuario(), nuevoUsuario.getEmail(), passwordEncoder.encode(nuevoUsuario.getPassword()));
         
         Set<Rol> roles = new HashSet<>();
         roles.add(rolService.getByRolNombre(RolNombre.ROLE_USER).get());
@@ -73,7 +76,7 @@ public class AuthController {
     }
     
     @PostMapping("/login")
-    public ResponseEntity<JwtDTO> login(@Valid @RequestBody LoginUsuario loginUsuario, BindingResult bindingResult){
+    public ResponseEntity<JwtDto> login(@Valid @RequestBody LoginUsuario loginUsuario, BindingResult bindingResult){
         if(bindingResult.hasErrors())
             return new ResponseEntity(new Mensaje("Campos erróneos"),HttpStatus.BAD_REQUEST);
         
@@ -85,7 +88,7 @@ public class AuthController {
         
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         
-        JwtDto jwtDto = new JwtDto(jwt, userDetails.getUsernamo(), userDetails.getAuthorities());
+        JwtDto jwtDto = new JwtDto(jwt, userDetails.getUsername(), userDetails.getAuthorities());
         
         return new ResponseEntity(jwtDto, HttpStatus.OK);
     }
